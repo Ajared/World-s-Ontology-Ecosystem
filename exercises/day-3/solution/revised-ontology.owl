@@ -1,0 +1,214 @@
+@prefix : <http://example.org/clinic-appointments#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+
+<http://example.org/clinic-appointments> a owl:Ontology ;
+    owl:imports <http://purl.obolibrary.org/obo/bfo.owl> ;
+    owl:versionInfo "revised" ;
+    rdfs:label "Clinic Appointment Ontology (revised)"@en ;
+    rdfs:comment "Revised version of the generated ontology. BFO is imported (see catalog-v001.xml) so that its disjointness axioms apply. The booking, an information entity, is kept apart from the visit, the process it prescribes."@en .
+
+#################################################################
+# Classes
+#################################################################
+
+:Person a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000030 ;
+    rdfs:label "person"@en ;
+    skos:definition "An object that is a human being."@en .
+
+:PatientRole a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000023 ;
+    rdfs:label "patient role"@en ;
+    skos:definition "A role that inheres in a person and that is realized in processes in which the person receives health care from a clinician."@en .
+
+:ClinicianRole a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000023 ;
+    rdfs:label "clinician role"@en ;
+    skos:definition "A role that inheres in a person and that is realized in processes in which the person provides health care to a patient."@en .
+
+[] a owl:AllDisjointClasses ; owl:members ( :PatientRole :ClinicianRole ) .
+
+:ClinicVisit a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000015 ,
+        [ a owl:Restriction ; owl:onProperty obo:BFO_0000055 ; owl:someValuesFrom :PatientRole ] ,
+        [ a owl:Restriction ; owl:onProperty obo:BFO_0000055 ; owl:someValuesFrom :ClinicianRole ] ;
+    rdfs:label "clinic visit"@en ;
+    skos:definition "A process that occurs at a clinic and in which a clinician provides health care to a patient, realizing their clinician role and patient role."@en .
+
+:AppointmentBooking a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000031 ;
+    rdfs:label "appointment booking"@en ;
+    skos:definition "A generically dependent continuant that prescribes a clinic visit between a specified patient and clinician at a specified time."@en .
+
+:FulfilledAppointmentBooking a owl:Class ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf ( :AppointmentBooking [ a owl:Restriction ; owl:onProperty :prescribes ; owl:someValuesFrom :ClinicVisit ] )
+    ] ;
+    rdfs:label "fulfilled appointment booking"@en ;
+    skos:definition "An appointment booking for which a clinic visit carried out in accordance with it has occurred."@en .
+
+:CancelledAppointmentBooking a owl:Class ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf ( :AppointmentBooking [ a owl:Restriction ; owl:onProperty :hasBookingStatus ; owl:hasValue "cancelled" ] )
+    ] ;
+    rdfs:label "cancelled appointment booking"@en ;
+    skos:definition "An appointment booking that the clinic's scheduling system marks as withdrawn before the visit it prescribes was due to take place."@en .
+
+:MissedAppointmentBooking a owl:Class ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf ( :AppointmentBooking [ a owl:Restriction ; owl:onProperty :hasBookingStatus ; owl:hasValue "no-show" ] )
+    ] ;
+    rdfs:label "missed appointment booking"@en ;
+    skos:definition "An appointment booking that the clinic's scheduling system marks as not attended by the patient at the booked time."@en .
+
+# A booking cannot be both fulfilled and cancelled or missed. Without this axiom the reasoner
+# accepted a cancelled booking that also prescribed a visit (found while testing the revision).
+[] a owl:AllDisjointClasses ;
+   owl:members ( :FulfilledAppointmentBooking :CancelledAppointmentBooking :MissedAppointmentBooking ) .
+
+:ExaminationRoom a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000029 ;
+    rdfs:label "examination room"@en ;
+    skos:definition "A site within a clinic building that is designed for clinicians to examine patients."@en .
+
+:VisitRecord a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000031 ,
+        [ a owl:Restriction ; owl:onProperty :isAbout ; owl:someValuesFrom :ClinicVisit ] ;
+    rdfs:label "visit record"@en ;
+    skos:definition "A generically dependent continuant that documents what took place during a particular clinic visit."@en .
+
+:ReasonForVisitStatement a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000031 ;
+    rdfs:label "reason for visit statement"@en ;
+    skos:definition "A generically dependent continuant that states the health concern for which a patient seeks a clinic visit."@en .
+
+#################################################################
+# Object properties
+#################################################################
+
+:isAbout a owl:ObjectProperty ;
+    rdfs:domain obo:BFO_0000031 ;
+    rdfs:label "is about"@en ;
+    skos:definition "A relation that holds between an information entity and an entity when the information entity describes, denotes, or specifies that entity."@en .
+
+:prescribes a owl:ObjectProperty ;
+    rdfs:domain :AppointmentBooking ;
+    rdfs:range :ClinicVisit ;
+    rdfs:label "prescribes"@en ;
+    skos:definition "A relation that holds between an appointment booking and a clinic visit when the visit takes place in accordance with the booking."@en .
+
+:booksPatient a owl:ObjectProperty ;
+    rdfs:subPropertyOf :isAbout ;
+    rdfs:domain :AppointmentBooking ;
+    rdfs:range :Person ;
+    rdfs:label "books patient"@en ;
+    skos:definition "A relation that holds between an appointment booking and a person when the booking names that person as the one to receive care in the prescribed visit."@en .
+
+:booksClinician a owl:ObjectProperty ;
+    rdfs:subPropertyOf :isAbout ;
+    rdfs:domain :AppointmentBooking ;
+    rdfs:range :Person ;
+    rdfs:label "books clinician"@en ;
+    skos:definition "A relation that holds between an appointment booking and a person when the booking names that person as the one to provide care in the prescribed visit."@en .
+
+:booksRoom a owl:ObjectProperty ;
+    rdfs:subPropertyOf :isAbout ;
+    rdfs:domain :AppointmentBooking ;
+    rdfs:range :ExaminationRoom ;
+    rdfs:label "books room"@en ;
+    skos:definition "A relation that holds between an appointment booking and an examination room when the booking reserves that room for the prescribed visit."@en .
+
+:statesReason a owl:ObjectProperty ;
+    rdfs:domain obo:BFO_0000031 ;
+    rdfs:range :ReasonForVisitStatement ;
+    rdfs:label "states reason"@en ;
+    skos:definition "A relation that holds between an information entity and a reason for visit statement when the statement is part of what the information entity records."@en .
+
+#################################################################
+# Data properties
+#################################################################
+
+:hasScheduledStart a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:domain :AppointmentBooking ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "has scheduled start"@en ;
+    skos:definition "A relation that holds between an appointment booking and a date-time when the booking prescribes that the visit begin at that date-time."@en .
+
+:hasBookingStatus a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:domain :AppointmentBooking ;
+    rdfs:range xsd:string ;
+    rdfs:label "has booking status"@en ;
+    skos:definition "A relation that holds between an appointment booking and a string when the string is the status code the scheduling system assigns to the booking (booked, cancelled, no-show, attended)."@en .
+
+:hasStatementText a owl:DatatypeProperty ;
+    rdfs:domain obo:BFO_0000031 ;
+    rdfs:range xsd:string ;
+    rdfs:label "has statement text"@en ;
+    skos:definition "A relation that holds between an information entity and a string when the string is the wording in which the information entity is recorded."@en .
+
+#################################################################
+# Individuals
+#################################################################
+
+:JaneDoe a owl:NamedIndividual , :Person ;
+    rdfs:label "Jane Doe"@en ;
+    obo:BFO_0000196 :JaneDoe_patient_role .
+
+:JaneDoe_patient_role a owl:NamedIndividual , :PatientRole ;
+    rdfs:label "patient role of Jane Doe"@en .
+
+:JohnSmith a owl:NamedIndividual , :Person ;
+    rdfs:label "John Smith"@en .
+
+:DrLee a owl:NamedIndividual , :Person ;
+    rdfs:label "Dr. Lee"@en ;
+    obo:BFO_0000196 :DrLee_clinician_role .
+
+:DrLee_clinician_role a owl:NamedIndividual , :ClinicianRole ;
+    rdfs:label "clinician role of Dr. Lee"@en .
+
+:Room3 a owl:NamedIndividual , :ExaminationRoom ;
+    rdfs:label "Room 3"@en .
+
+:Booking_001 a owl:NamedIndividual , :AppointmentBooking ;
+    rdfs:label "Booking 001"@en ;
+    :booksPatient :JaneDoe ;
+    :booksClinician :DrLee ;
+    :booksRoom :Room3 ;
+    :hasScheduledStart "2026-10-01T09:30:00"^^xsd:dateTime ;
+    :hasBookingStatus "attended" ;
+    :statesReason :Reason_001 ;
+    :prescribes :Visit_001 .
+
+:Visit_001 a owl:NamedIndividual , :ClinicVisit ;
+    rdfs:label "Visit 001"@en ;
+    obo:BFO_0000057 :JaneDoe , :DrLee ;
+    obo:BFO_0000055 :JaneDoe_patient_role , :DrLee_clinician_role ;
+    obo:BFO_0000066 :Room3 .
+
+:Reason_001 a owl:NamedIndividual , :ReasonForVisitStatement ;
+    rdfs:label "reason for visit stated in Booking 001"@en ;
+    :isAbout :JaneDoe ;
+    :hasStatementText "Persistent cough for two weeks" .
+
+:Record_001 a owl:NamedIndividual , :VisitRecord ;
+    rdfs:label "Record 001"@en ;
+    :isAbout :Visit_001 ;
+    :statesReason :Reason_001 .
+
+# The cancelled booking prescribes no visit: the visit never occurred, so no process individual exists.
+:Booking_002 a owl:NamedIndividual , :AppointmentBooking ;
+    rdfs:label "Booking 002"@en ;
+    :booksPatient :JohnSmith ;
+    :booksClinician :DrLee ;
+    :booksRoom :Room3 ;
+    :hasScheduledStart "2026-10-01T10:00:00"^^xsd:dateTime ;
+    :hasBookingStatus "cancelled" .

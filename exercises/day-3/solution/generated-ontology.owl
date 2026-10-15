@@ -1,0 +1,185 @@
+@prefix : <http://example.org/clinic-appointments#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+
+<http://example.org/clinic-appointments> a owl:Ontology ;
+    rdfs:label "Clinic Appointment Ontology"@en ;
+    rdfs:comment "An ontology for outpatient appointments at a clinic, aligned with BFO 2020."@en .
+
+#################################################################
+# BFO classes (declared, not imported)
+#################################################################
+
+obo:BFO_0000040 a owl:Class ; rdfs:label "material entity"@en .
+obo:BFO_0000015 a owl:Class ; rdfs:label "process"@en .
+obo:BFO_0000031 a owl:Class ; rdfs:label "generically dependent continuant"@en .
+obo:BFO_0000023 a owl:Class ; rdfs:label "role"@en .
+obo:BFO_0000029 a owl:Class ; rdfs:label "site"@en .
+
+#################################################################
+# Classes
+#################################################################
+
+:Person a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000040 ;
+    rdfs:label "Person"@en ;
+    skos:definition "A human being."@en .
+
+:Patient a owl:Class ;
+    rdfs:subClassOf :Person ;
+    rdfs:label "Patient"@en ;
+    skos:definition "A person who is a patient of the clinic."@en .
+
+:Clinician a owl:Class ;
+    rdfs:subClassOf :Person ;
+    rdfs:label "Clinician"@en ;
+    skos:definition "A healthcare professional such as a doctor or nurse who sees patients."@en .
+
+:Appointment a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000015 ;
+    rdfs:label "Appointment"@en ;
+    skos:definition "An appointment is a scheduled meeting between a patient and a clinician at the clinic."@en .
+
+:Visit a owl:Class ;
+    owl:equivalentClass :Appointment ;
+    rdfs:label "Visit"@en ;
+    skos:definition "A visit by a patient to the clinic."@en .
+
+:CancelledAppointment a owl:Class ;
+    rdfs:subClassOf :Appointment ;
+    rdfs:label "Cancelled Appointment"@en ;
+    skos:definition "An appointment that was cancelled."@en .
+
+:MissedAppointment a owl:Class ;
+    rdfs:subClassOf :Appointment ;
+    rdfs:label "Missed Appointment"@en ;
+    skos:definition "An appointment where the patient did not show up."@en .
+
+:ExaminationRoom a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000029 ;
+    rdfs:label "Examination Room"@en ;
+    skos:definition "A room in the clinic used for examining patients."@en .
+
+:ReasonForVisit a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000031 ;
+    rdfs:label "Reason For Visit"@en ;
+    skos:definition "Information related to why the patient is visiting, usually a symptom or complaint."@en .
+
+:VisitRecord a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000031 ;
+    rdfs:label "Visit Record"@en ;
+    skos:definition "A record of a visit."@en .
+
+:PatientRole a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000023 ;
+    rdfs:label "Patient Role"@en ;
+    skos:definition "The role of being a patient."@en .
+
+#################################################################
+# Object properties
+#################################################################
+
+:hasPatient a owl:ObjectProperty ;
+    rdfs:domain :Appointment ;
+    rdfs:range :Patient ;
+    rdfs:label "has patient"@en ;
+    skos:definition "Relates an appointment to its patient."@en .
+
+:hasClinician a owl:ObjectProperty ;
+    rdfs:domain :Appointment ;
+    rdfs:range :Clinician ;
+    rdfs:label "has clinician"@en ;
+    skos:definition "Relates an appointment to the clinician."@en .
+
+:occursIn a owl:ObjectProperty ;
+    rdfs:domain :Appointment ;
+    rdfs:range :ExaminationRoom ;
+    rdfs:label "occurs in"@en ;
+    skos:definition "Relates an appointment to the room where it occurs."@en .
+
+:hasReason a owl:ObjectProperty ;
+    rdfs:domain :Appointment ;
+    rdfs:range :ReasonForVisit ;
+    rdfs:label "has reason"@en ;
+    skos:definition "Relates an appointment to the reason for the visit."@en .
+
+:relatedTo a owl:ObjectProperty , owl:SymmetricProperty ;
+    rdfs:label "related to"@en ;
+    skos:definition "A general relation between two entities."@en .
+
+:hasRecord a owl:ObjectProperty ;
+    rdfs:domain :Appointment ;
+    rdfs:range :VisitRecord ;
+    rdfs:label "has record"@en ;
+    skos:definition "Relates an appointment to its record."@en .
+
+#################################################################
+# Data properties
+#################################################################
+
+:hasScheduledTime a owl:DatatypeProperty ;
+    rdfs:domain :Appointment ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "has scheduled time"@en ;
+    skos:definition "The date and time the appointment is scheduled for."@en .
+
+:hasStatus a owl:DatatypeProperty ;
+    rdfs:domain :Appointment ;
+    rdfs:range xsd:string ;
+    rdfs:label "has status"@en ;
+    skos:definition "The status of the appointment, e.g. booked, completed, cancelled, no-show."@en .
+
+:hasReasonText a owl:DatatypeProperty ;
+    rdfs:domain :ReasonForVisit ;
+    rdfs:range xsd:string ;
+    rdfs:label "has reason text"@en ;
+    skos:definition "The text of the reason."@en .
+
+#################################################################
+# Individuals
+#################################################################
+
+:JaneDoe a owl:NamedIndividual , :Patient ;
+    rdfs:label "Jane Doe"@en .
+
+:JohnSmith a owl:NamedIndividual , :Patient ;
+    rdfs:label "John Smith"@en .
+
+:DrLee a owl:NamedIndividual , :Clinician ;
+    rdfs:label "Dr. Lee"@en .
+
+:Room3 a owl:NamedIndividual , :ExaminationRoom ;
+    rdfs:label "Room 3"@en .
+
+:Reason_Cough a owl:NamedIndividual , :ReasonForVisit ;
+    rdfs:label "Cough"@en ;
+    :hasReasonText "Persistent cough for two weeks" .
+
+:Appointment_001 a owl:NamedIndividual , :Appointment ;
+    rdfs:label "Appointment 001"@en ;
+    :hasPatient :JaneDoe ;
+    :hasClinician :DrLee ;
+    :occursIn :Room3 ;
+    :hasReason :Reason_Cough ;
+    :hasRecord :Record_001 ;
+    :hasScheduledTime "2026-10-01T09:30:00"^^xsd:dateTime ;
+    :hasStatus "completed" .
+
+:Appointment_002 a owl:NamedIndividual , :CancelledAppointment ;
+    rdfs:label "Appointment 002"@en ;
+    :hasPatient :JohnSmith ;
+    :hasClinician :DrLee ;
+    :occursIn :Room3 ;
+    :hasScheduledTime "2026-10-01T10:00:00"^^xsd:dateTime ;
+    :hasStatus "cancelled" .
+
+:Record_001 a owl:NamedIndividual , :VisitRecord ;
+    rdfs:label "Record 001"@en ;
+    :relatedTo :Appointment_001 .
+
+:Completed a owl:NamedIndividual ;
+    rdfs:label "Completed"@en .
