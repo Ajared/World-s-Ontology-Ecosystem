@@ -1,0 +1,23 @@
+# Derives the maintenance application's operational view from capstone-model.owl.
+PREFIX : <https://example.org/worlds-ontology-ecosystem/day5/>
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?pump ?lastInspection ?measuredVibration ?maintenanceAction ?workOrder
+WHERE {
+  ?inspection a :Inspection ;
+              obo:BFO_0000057 ?pumpEntity ;           # has participant
+              :hasSpecifiedOutput ?report .
+  ?pumpEntity a :Pump ; rdfs:label ?pump .
+  ?inspection rdfs:label ?lastInspection .
+  ?report obo:BFO_0000178 ?datum .                  # has continuant part
+  ?datum a :VibrationMeasurementDatum ;
+         :hasDecimalValue ?value ;
+         :hasUnitLabel ?unit .
+  ?wo a :WorkOrder ;
+      :isAbout ?pumpEntity ;
+      :requests ?action ;
+      rdfs:label ?workOrder .
+  ?action rdfs:label ?maintenanceAction .
+  BIND (CONCAT(STR(?value), " ", ?unit) AS ?measuredVibration)
+}

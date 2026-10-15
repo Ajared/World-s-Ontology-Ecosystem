@@ -1,0 +1,213 @@
+@prefix : <https://example.org/worlds-ontology-ecosystem/day5/> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://example.org/worlds-ontology-ecosystem/day5>
+    a owl:Ontology ;
+    owl:imports <http://purl.obolibrary.org/obo/bfo.owl> ;
+    rdfs:label "Day 5 Capstone: Pump Inspection Pattern"@en ;
+    rdfs:comment "A small design pattern for a prescribed pump inspection, the information it produces, and the maintenance action that the information leads to."@en .
+
+#################################################################
+# Classes
+#################################################################
+
+:Pump
+    a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000030 ;
+    rdfs:label "pump"@en ;
+    skos:definition "An object that is designed to move fluid by mechanical action."@en .
+
+:Person
+    a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000030 ;
+    rdfs:label "person"@en .
+
+:TechnicianRole
+    a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000023 ;
+    rdfs:label "technician role"@en ;
+    skos:definition "A role that inheres in a person and that is realized in processes in which that person performs maintenance or inspection work on equipment."@en .
+
+:Vibration
+    a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000019 ;
+    rdfs:label "vibration"@en ;
+    skos:definition "A quality of a material entity that consists in the oscillating motion of the entity about an equilibrium position."@en .
+
+:Inspection
+    a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000015 ;
+    rdfs:label "inspection"@en ;
+    skos:definition "A process in which a participant examines a material entity in order to produce information about the condition of that entity."@en .
+
+:PumpInspection
+    a owl:Class ;
+    rdfs:label "pump inspection"@en ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf (
+            :Inspection
+            [ a owl:Restriction ; owl:onProperty obo:BFO_0000057 ; owl:someValuesFrom :Pump ]
+        )
+    ] ;
+    skos:definition "An inspection that has a pump as a participant."@en .
+
+:InspectionProcedure
+    a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000031 ;
+    rdfs:label "inspection procedure"@en ;
+    skos:definition "A generically dependent continuant that prescribes how and when inspections of some kind of equipment are to be carried out."@en .
+
+:InspectionReport
+    a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000031 ,
+        [ a owl:Restriction ; owl:onProperty :isSpecifiedOutputOf ; owl:someValuesFrom :Inspection ] ;
+    rdfs:label "inspection report"@en ;
+    skos:definition "A generically dependent continuant that is the specified output of an inspection and that is about the entity inspected."@en .
+
+:VibrationMeasurementDatum
+    a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000031 ,
+        [ a owl:Restriction ; owl:onProperty :isAbout ; owl:someValuesFrom :Vibration ] ;
+    rdfs:label "vibration measurement datum"@en ;
+    skos:definition "A generically dependent continuant that is about a vibration and that records a measured magnitude of it as a numeral and a unit."@en .
+
+:MaintenanceActionSpecification
+    a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000031 ;
+    rdfs:label "maintenance action specification"@en ;
+    skos:definition "A generically dependent continuant that specifies a maintenance process that is to be carried out on some equipment."@en .
+
+:WorkOrder
+    a owl:Class ;
+    rdfs:subClassOf obo:BFO_0000031 ,
+        [ a owl:Restriction ; owl:onProperty :requests ; owl:someValuesFrom :MaintenanceActionSpecification ] ;
+    rdfs:label "work order"@en ;
+    skos:definition "A generically dependent continuant that requests that the maintenance action specified by some maintenance action specification be carried out."@en .
+
+#################################################################
+# Object properties
+#################################################################
+
+:isAbout
+    a owl:ObjectProperty ;
+    rdfs:domain obo:BFO_0000031 ;
+    rdfs:label "is about"@en ;
+    skos:definition "A relation that holds between an information entity and some entity when the information entity describes, denotes, or specifies that entity."@en .
+
+:prescribes
+    a owl:ObjectProperty ;
+    rdfs:domain obo:BFO_0000031 ;
+    rdfs:range obo:BFO_0000015 ;
+    rdfs:label "prescribes"@en ;
+    skos:definition "A relation that holds between a directive information entity and a process when the process is carried out in accordance with what the information entity directs."@en .
+
+:isSpecifiedOutputOf
+    a owl:ObjectProperty ;
+    rdfs:domain obo:BFO_0000031 ;
+    rdfs:range obo:BFO_0000015 ;
+    owl:inverseOf :hasSpecifiedOutput ;
+    rdfs:label "is specified output of"@en .
+
+:hasSpecifiedOutput
+    a owl:ObjectProperty ;
+    rdfs:domain obo:BFO_0000015 ;
+    rdfs:range obo:BFO_0000031 ;
+    rdfs:label "has specified output"@en ;
+    skos:definition "A relation that holds between a process and an information entity when the information entity is created by the process and producing it is part of what the process is intended to achieve."@en .
+
+:recommends
+    a owl:ObjectProperty ;
+    rdfs:domain obo:BFO_0000031 ;
+    rdfs:range :MaintenanceActionSpecification ;
+    rdfs:label "recommends"@en .
+
+:requests
+    a owl:ObjectProperty ;
+    rdfs:domain obo:BFO_0000031 ;
+    rdfs:range :MaintenanceActionSpecification ;
+    rdfs:label "requests"@en .
+
+#################################################################
+# Data properties
+#################################################################
+
+:hasDecimalValue
+    a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "has decimal value"@en .
+
+:hasUnitLabel
+    a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "has unit label"@en .
+
+:hasIntervalInDays
+    a owl:DatatypeProperty ;
+    rdfs:range xsd:integer ;
+    rdfs:label "has interval in days"@en .
+
+#################################################################
+# Named individuals
+#################################################################
+
+:pump_p17
+    a owl:NamedIndividual , :Pump ;
+    rdfs:label "Pump P-17"@en ;
+    obo:BFO_0000196 :vibration_p17 .
+
+:vibration_p17
+    a owl:NamedIndividual , :Vibration ;
+    rdfs:label "vibration of Pump P-17"@en .
+
+:alex
+    a owl:NamedIndividual , :Person ;
+    rdfs:label "Alex"@en ;
+    obo:BFO_0000196 :alex_technician_role .
+
+:alex_technician_role
+    a owl:NamedIndividual , :TechnicianRole ;
+    rdfs:label "technician role of Alex"@en .
+
+:pump_inspection_procedure
+    a owl:NamedIndividual , :InspectionProcedure ;
+    rdfs:label "pump inspection procedure"@en ;
+    :hasIntervalInDays 30 ;
+    :prescribes :inspection_17 .
+
+:inspection_17
+    a owl:NamedIndividual , :Inspection ;
+    rdfs:label "Inspection 17"@en ;
+    obo:BFO_0000057 :alex , :pump_p17 ;
+    obo:BFO_0000055 :alex_technician_role ;
+    :hasSpecifiedOutput :report_r17 .
+
+:report_r17
+    a owl:NamedIndividual , :InspectionReport ;
+    rdfs:label "Report R-17"@en ;
+    :isAbout :pump_p17 ;
+    obo:BFO_0000178 :vibration_measurement_r17 ;
+    :recommends :replace_bearing_p17 .
+
+:vibration_measurement_r17
+    a owl:NamedIndividual , :VibrationMeasurementDatum ;
+    rdfs:label "vibration measurement in R-17"@en ;
+    :isAbout :vibration_p17 ;
+    :hasDecimalValue "4.2"^^xsd:decimal ;
+    :hasUnitLabel "mm/s" .
+
+:replace_bearing_p17
+    a owl:NamedIndividual , :MaintenanceActionSpecification ;
+    rdfs:label "Replace bearing"@en ;
+    :isAbout :pump_p17 .
+
+:work_order_w22
+    a owl:NamedIndividual , :WorkOrder ;
+    rdfs:label "Work Order W-22"@en ;
+    :isAbout :pump_p17 ;
+    :requests :replace_bearing_p17 .
