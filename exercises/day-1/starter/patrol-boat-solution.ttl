@@ -1,0 +1,76 @@
+@prefix ex: <https://example.org/worlds-ontology-ecosystem/day1/> .
+@prefix bfo: <http://purl.obolibrary.org/obo/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://example.org/worlds-ontology-ecosystem/day1>
+    a owl:Ontology ;
+    owl:imports <http://purl.obolibrary.org/obo/bfo.owl> ;
+    rdfs:label "Day 1 Patrol Boat Exercise — worked solution"@en .
+
+ex:PatrolBoat a owl:Class ;
+    rdfs:subClassOf bfo:BFO_0000040 ;
+    rdfs:label "Patrol boat"@en .
+
+ex:ActOfMotion a owl:Class ;
+    rdfs:subClassOf bfo:BFO_0000015 ;
+    rdfs:label "Act of motion"@en .
+
+ex:MeasurementDatum a owl:Class ;
+    rdfs:subClassOf bfo:BFO_0000031 ;
+    rdfs:label "Measurement datum"@en .
+
+ex:SpeedMeasurementDatum a owl:Class ;
+    rdfs:subClassOf ex:MeasurementDatum ;
+    rdfs:label "Speed measurement datum"@en .
+
+ex:DurationMeasurementDatum a owl:Class ;
+    rdfs:subClassOf ex:MeasurementDatum ;
+    rdfs:label "Duration measurement datum"@en .
+
+ex:MeasurementUnit a owl:Class ;
+    rdfs:subClassOf bfo:BFO_0000031 ;
+    rdfs:label "Measurement unit"@en .
+
+ex:MovingPatrolBoat a owl:Class ;
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf (
+            ex:PatrolBoat
+            [ a owl:Restriction ;
+                owl:onProperty bfo:BFO_0000056 ;
+                owl:someValuesFrom ex:ActOfMotion ]
+        ) ] ;
+    rdfs:label "Moving patrol boat"@en .
+
+ex:isAbout a owl:ObjectProperty ;
+    rdfs:label "is about"@en ;
+    rdfs:comment "Relates an information content entity to the entity it represents or concerns."@en .
+
+ex:hasMeasurementUnit a owl:ObjectProperty ;
+    rdfs:domain ex:MeasurementDatum ;
+    rdfs:range ex:MeasurementUnit ;
+    rdfs:label "has measurement unit"@en .
+
+ex:hasDecimalValue a owl:DatatypeProperty ;
+    rdfs:domain ex:MeasurementDatum ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "has decimal value"@en .
+
+ex:patrol_boat_01 a owl:NamedIndividual, ex:PatrolBoat ;
+    bfo:BFO_0000056 ex:motion_01 .
+
+ex:motion_01 a owl:NamedIndividual, ex:ActOfMotion .
+
+ex:speed_measurement_01 a owl:NamedIndividual, ex:SpeedMeasurementDatum ;
+    ex:isAbout ex:motion_01 ;
+    ex:hasMeasurementUnit ex:knot ;
+    ex:hasDecimalValue "12.0"^^xsd:decimal .
+
+ex:duration_measurement_01 a owl:NamedIndividual, ex:DurationMeasurementDatum ;
+    ex:isAbout ex:motion_01 ;
+    ex:hasMeasurementUnit ex:hour ;
+    ex:hasDecimalValue "1.0"^^xsd:decimal .
+
+ex:knot a owl:NamedIndividual, ex:MeasurementUnit .
+ex:hour a owl:NamedIndividual, ex:MeasurementUnit .
