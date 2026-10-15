@@ -1,132 +1,77 @@
-# Day 4 Exercise: Abductive Agents and the Zebra Puzzle
+# Day 4 Exercise: Ground, Critique, Validate
 
-## Overview
+Use this guide with the [Day 4 overview](README.md). The exercise compares
+abductive hypotheses from AI agents with constraint validation and a separate
+OWL entailment check. The ontology stages and experiment settings are already
+provided; you do not need to rebuild the Zebra Puzzle ontology.
 
-In this exercise, you will compare two forms of automated reasoning:
+## 1. Inspect the experiment
 
-- **Abductive reasoning with a generative AI model**, which proposes the most plausible answer from incomplete information.
-- **Deductive reasoning with an OWL reasoner**, which derives only what follows logically from the axioms encoded in an ontology.
+Read the experiment table and workflow overview in `README.md`, then inspect
+`exercise.json`. Find the four experiment definitions and note which stages,
+ontology grounding, Critic, and SHACL validation each one uses. Read the
+hypothesis and Critic prompts, paying particular attention to the difference
+between a plausible preference, a possible arrangement, and an entailed fact.
 
-You will model the Zebra Puzzle in Protégé, add its clues in stages, and compare the guesses produced by a generative AI model with the conclusions produced by HermiT.
+## 2. Prepare and run
 
-## Learning Goals
+Install [UV](https://docs.astral.sh/uv/) if it is not already available. From
+this directory, prepare and verify the offline setup:
 
-By the end of the exercise, you should be able to:
+```bash
+make install verify-setup test
+```
 
-1. Explain the difference between deductive and abductive reasoning.
-2. Encode puzzle constraints as OWL axioms.
-3. Use a generative AI model to make abductive guesses from incomplete information.
-4. Use HermiT to determine what follows deductively from an OWL ontology.
-5. Evaluate how the outputs of a generative AI model change as additional axioms are supplied.
+Then configure the model provider and credentials as described in `README.md`
+and `config.yaml`, and run:
 
-## What You Will Need
+```bash
+make
+```
 
-- Protégé and the HermiT reasoner
-- Access to a generative AI model of your choice
-- A copy of this repository
+Keep credentials in the local `.env` file; do not add them to a commit. Each
+run creates a timestamped directory under `runs/` containing a consolidated
+CSV and detailed records for each experiment and ontology stage.
 
-## Important Rule for the AI Model
+## 3. Compare the four experiments
 
-The Zebra Puzzle is widely known, and its solution is available online. Tell the model:
+Use `agent-run-log.csv` and the experiment-specific artifacts to compare:
 
-> Do not search the web, retrieve a memorized solution, or rely on prior knowledge of the Zebra Puzzle. Reason only from the clues supplied in this prompt.
+1. **LLM only:** What does the model claim without ontology evidence?
+2. **Ontology-grounded:** Which claims now cite axioms, and do those citations
+   support the reasoning steps?
+3. **Critic added:** What errors does the Critic identify? Does the revision
+   address the named evidence or reasoning problem?
+4. **SHACL feedback loop:** Which concrete arrangement violations are
+   reported, and how does the proposal change over the cumulative stages?
 
-The purpose of the exercise is to observe abductive reasoning from incomplete information. Looking up the known solution undermines the experiment.
+For each claim, distinguish supporting evidence from assumptions and
+unresolved ties. A SHACL-conforming arrangement establishes that one candidate
+is possible for that arrangement; it does not establish uniqueness or logical
+entailment. An LLM Critic is also not a formal validator.
 
----
+## 4. Run the separate deductive check
 
-## Part 1: Create the Ontology
+Open `ontology/zebra-round-4.owl` in Protégé, start an OWL 2 DL reasoner, and
+query:
 
-Create a new OWL ontology in Protégé.
+```text
+Resident and livesIn some (hasPet value Zebra)
+```
 
-Your ontology should represent:
+Compare the result with the final abductive hypothesis and SHACL evidence.
+State whether the answer is merely plausible, supported as possible by a
+conforming arrangement, or entailed by the ontology. Explain what evidence
+supports that status.
 
-1. There are five houses.
-2. The Englishman lives in the red house.
-3. The Spaniard owns the dog.
-4. Coffee is drunk in the green house.
-5. The Ukrainian drinks tea.
+## 5. Reflect
 
-Add appropriate domains, ranges, inverses, and cardinality constraints. 
+In your notes, answer:
 
-Use classes and restrictions where the identity of an individual is not yet known. The goal is to allow the reasoner to determine instance-level facts from the constraints.
-
-Run HermiT and examine what information - if any - has been inferred (look for lines in yellow in Protege).
-
----
-
-## Part 2: First Abductive Guess
-
-Give your AI model the OWL file you've created and ask:
-
-> Who owns the zebra? Make the best abductive guess you can from only these clues. Explain your reasoning, identify any assumptions you make, and state how confident you are.
-
-Save the model's response.
-
-At this stage, the model does not have enough information to determine the answer deductively. It may still make a guess.
-
----
-
-## Part 3: Add the Second Group of Clues
-
-Add these clues to both the ontology:
-
-6. The green house is immediately to the right of the ivory house.
-7. The Old Gold smoker owns snails.
-8. Kools are smoked in the yellow house.
-
-Run HermiT and examine what information - if any - has been inferred (look for lines in yellow in Protege).
-
-Then ask the AI model to answer the question against your updated OWL file. Tell it not to preserve its earlier answer merely for consistency.
-
----
-
-## Part 4: Add the Third Group of Clues
-
-Add these clues to your OWL file:
-
-9. Milk is drunk in the middle house.
-10. The Norwegian lives in the first house.
-11. The person who smokes Chesterfields lives next to the person who owns the fox.
-
-Run HermiT and examine what information - if any - has been inferred (look for lines in yellow in Protege).
-
-Then ask the AI model to answer the question against your updated OWL file. Tell it not to preserve its earlier answer merely for consistency.
-
----
-
-## Part 5: Complete the Puzzle
-
-Add the remaining clues:
-
-12. Kools are smoked in a house next to the house where the horse is kept.
-13. The Lucky Strike smoker drinks orange juice.
-14. The Japanese person smokes Parliaments.
-15. The Norwegian lives next to the blue house.
-
-Before running HermiT, verify that:
-
-- all five members of each category are represented;
-- the five houses are ordered correctly;
-- `next to` is represented symmetrically;
-- `immediately to the right of` has the intended direction;
-- inverse properties are declared where appropriate;
-- domains and ranges point in the correct direction;
-- one-to-one constraints are represented;
-- individuals that must be distinct are declared different;
-- none of the clues has been encoded as the desired conclusion.
-
-Run HermiT and inspect the inferred facts. If you've done the exercise correctly, the owner of the zebra will be revealed as a consequence of your assertions. 
-
-Finally, give the AI model the complete set of assertions and ask it to answer one last time.
-
-The OWL reasoner and the AI model should now reach the same answer, although they may reach it in very different ways...or perhaps not at all...
-
----
-
-## Deliverables
-
-Submit:
-
-1. Your completed OWL file.
-2. A prompt-and-response log for all four AI runs.
+- What did ontology grounding add to the LLM-only response?
+- What did the Critic catch that the workflow could verify, and what remained
+  outside its reach?
+- How did SHACL feedback change the proposed arrangement?
+- Did the final OWL query entail a unique owner? What axioms support your
+  answer?
+- Where did the abductive and deductive results agree or differ?

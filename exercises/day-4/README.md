@@ -1,6 +1,6 @@
 # Day 4 Ontology Exercise
 
-1. If needed, complete [`protege-setup.md`](protege-setup.md).
+1. If needed, complete the shared [Protégé setup instructions](../day-1/protege-setup.md).
 2. Follow [`exercise-instructions.md`](exercise-instructions.md).
 
 ---
@@ -114,7 +114,7 @@ by experiment and stage beneath the same directory.
 
 ## Files
 
-- `EXERCISE.md`: your step-by-step procedure and audit questions
+- `exercise-instructions.md`: your step-by-step procedure and audit questions
 - `exercise.json`: the complete experiment declaration you will read and audit
 - `config.yaml`: provider settings and the agent-model list
 - `Makefile`: one-command setup, verification, and execution
