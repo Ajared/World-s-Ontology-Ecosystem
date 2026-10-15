@@ -1,0 +1,155 @@
+@prefix : <https://example.org/worlds-ontology-ecosystem/day4/zebra#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<https://example.org/worlds-ontology-ecosystem/day4/zebra/stage-1> a owl:Ontology ;
+    rdfs:label "Zebra Puzzle, stage 1 (clues 1-5)"@en .
+
+:House a owl:Class ;
+    rdfs:label "house"@en ;
+    skos:definition "A building in the five-house row that has exactly one resident, colour, beverage, pet, and cigarette brand."@en ;
+    owl:equivalentClass [ a owl:Class ; owl:oneOf ( :House1 :House2 :House3 :House4 :House5 ) ] ;
+    rdfs:subClassOf
+        [ a owl:Restriction ; owl:onProperty :hasResident ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass :Person ] ,
+        [ a owl:Restriction ; owl:onProperty :hasColor ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass :Color ] ,
+        [ a owl:Restriction ; owl:onProperty :hasDrink ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass :Beverage ] ,
+        [ a owl:Restriction ; owl:onProperty :hasPet ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass :Pet ] ,
+        [ a owl:Restriction ; owl:onProperty :hasSmoke ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass :CigaretteBrand ] .
+
+:Person a owl:Class ;
+    rdfs:label "Person"@en ;
+    skos:definition "A person who lives in exactly one of the five houses."@en ;
+    owl:equivalentClass [ a owl:Class ; owl:oneOf ( :Englishman :Spaniard :Ukrainian :Norwegian :Japanese ) ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty :livesIn ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass :House ] .
+
+:Color a owl:Class ;
+    rdfs:label "Color"@en ;
+    skos:definition "A house colour that is the exterior colour of exactly one of the five houses."@en ;
+    owl:equivalentClass [ a owl:Class ; owl:oneOf ( :Red :Green :Ivory :Yellow :Blue ) ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty :colorOf ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass :House ] .
+
+:Beverage a owl:Class ;
+    rdfs:label "Beverage"@en ;
+    skos:definition "A beverage that is drunk in exactly one of the five houses."@en ;
+    owl:equivalentClass [ a owl:Class ; owl:oneOf ( :Coffee :Tea :Milk :OrangeJuice :Water ) ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty :drunkIn ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass :House ] .
+
+:Pet a owl:Class ;
+    rdfs:label "Pet"@en ;
+    skos:definition "An animal that is kept in exactly one of the five houses."@en ;
+    owl:equivalentClass [ a owl:Class ; owl:oneOf ( :Dog :Snails :Fox :Horse :Zebra ) ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty :keptIn ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass :House ] .
+
+:CigaretteBrand a owl:Class ;
+    rdfs:label "CigaretteBrand"@en ;
+    skos:definition "A cigarette brand that is smoked in exactly one of the five houses."@en ;
+    owl:equivalentClass [ a owl:Class ; owl:oneOf ( :OldGold :Kools :Chesterfields :LuckyStrike :Parliaments ) ] ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty :smokedIn ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass :House ] .
+
+[] a owl:AllDisjointClasses ; owl:members ( :House :Person :Color :Beverage :Pet :CigaretteBrand ) .
+
+:livesIn a owl:ObjectProperty, owl:FunctionalProperty, owl:InverseFunctionalProperty ;
+    rdfs:domain :Person ; rdfs:range :House ; owl:inverseOf :hasResident .
+:hasResident a owl:ObjectProperty, owl:FunctionalProperty, owl:InverseFunctionalProperty ;
+    rdfs:domain :House ; rdfs:range :Person .
+
+:colorOf a owl:ObjectProperty, owl:FunctionalProperty, owl:InverseFunctionalProperty ;
+    rdfs:domain :Color ; rdfs:range :House ; owl:inverseOf :hasColor .
+:hasColor a owl:ObjectProperty, owl:FunctionalProperty, owl:InverseFunctionalProperty ;
+    rdfs:domain :House ; rdfs:range :Color .
+
+:drunkIn a owl:ObjectProperty, owl:FunctionalProperty, owl:InverseFunctionalProperty ;
+    rdfs:domain :Beverage ; rdfs:range :House ; owl:inverseOf :hasDrink .
+:hasDrink a owl:ObjectProperty, owl:FunctionalProperty, owl:InverseFunctionalProperty ;
+    rdfs:domain :House ; rdfs:range :Beverage .
+
+:keptIn a owl:ObjectProperty, owl:FunctionalProperty, owl:InverseFunctionalProperty ;
+    rdfs:domain :Pet ; rdfs:range :House ; owl:inverseOf :hasPet .
+:hasPet a owl:ObjectProperty, owl:FunctionalProperty, owl:InverseFunctionalProperty ;
+    rdfs:domain :House ; rdfs:range :Pet .
+
+:smokedIn a owl:ObjectProperty, owl:FunctionalProperty, owl:InverseFunctionalProperty ;
+    rdfs:domain :CigaretteBrand ; rdfs:range :House ; owl:inverseOf :hasSmoke .
+:hasSmoke a owl:ObjectProperty, owl:FunctionalProperty, owl:InverseFunctionalProperty ;
+    rdfs:domain :House ; rdfs:range :CigaretteBrand .
+
+:nextTo a owl:ObjectProperty, owl:SymmetricProperty, owl:IrreflexiveProperty ;
+    rdfs:domain :House ; rdfs:range :House ;
+    skos:definition "A relation that holds between two houses when they are adjacent in the row."@en .
+:immediatelyRightOf a owl:ObjectProperty, owl:FunctionalProperty, owl:InverseFunctionalProperty, owl:IrreflexiveProperty, owl:AsymmetricProperty ;
+    rdfs:domain :House ; rdfs:range :House ;
+    skos:definition "A relation that holds between house x and house y when x is adjacent to y on the side away from House1."@en .
+
+:House1 a owl:NamedIndividual, :House .
+:House2 a owl:NamedIndividual, :House .
+:House3 a owl:NamedIndividual, :House .
+:House4 a owl:NamedIndividual, :House .
+:House5 a owl:NamedIndividual, :House .
+:Englishman a owl:NamedIndividual, :Person .
+:Spaniard a owl:NamedIndividual, :Person .
+:Ukrainian a owl:NamedIndividual, :Person .
+:Norwegian a owl:NamedIndividual, :Person .
+:Japanese a owl:NamedIndividual, :Person .
+:Red a owl:NamedIndividual, :Color .
+:Green a owl:NamedIndividual, :Color .
+:Ivory a owl:NamedIndividual, :Color .
+:Yellow a owl:NamedIndividual, :Color .
+:Blue a owl:NamedIndividual, :Color .
+:Coffee a owl:NamedIndividual, :Beverage .
+:Tea a owl:NamedIndividual, :Beverage .
+:Milk a owl:NamedIndividual, :Beverage .
+:OrangeJuice a owl:NamedIndividual, :Beverage .
+:Water a owl:NamedIndividual, :Beverage .
+:Dog a owl:NamedIndividual, :Pet .
+:Snails a owl:NamedIndividual, :Pet .
+:Fox a owl:NamedIndividual, :Pet .
+:Horse a owl:NamedIndividual, :Pet .
+:Zebra a owl:NamedIndividual, :Pet .
+:OldGold a owl:NamedIndividual, :CigaretteBrand .
+:Kools a owl:NamedIndividual, :CigaretteBrand .
+:Chesterfields a owl:NamedIndividual, :CigaretteBrand .
+:LuckyStrike a owl:NamedIndividual, :CigaretteBrand .
+:Parliaments a owl:NamedIndividual, :CigaretteBrand .
+
+[] a owl:AllDifferent ; owl:distinctMembers ( :House1 :House2 :House3 :House4 :House5 ) .
+[] a owl:AllDifferent ; owl:distinctMembers ( :Englishman :Spaniard :Ukrainian :Norwegian :Japanese ) .
+[] a owl:AllDifferent ; owl:distinctMembers ( :Red :Green :Ivory :Yellow :Blue ) .
+[] a owl:AllDifferent ; owl:distinctMembers ( :Coffee :Tea :Milk :OrangeJuice :Water ) .
+[] a owl:AllDifferent ; owl:distinctMembers ( :Dog :Snails :Fox :Horse :Zebra ) .
+[] a owl:AllDifferent ; owl:distinctMembers ( :OldGold :Kools :Chesterfields :LuckyStrike :Parliaments ) .
+
+# Clue 1: there are five houses in a row. Adjacency is asserted and then closed.
+:House1 :nextTo :House2 .
+:House1 rdf:type [ a owl:Restriction ; owl:onProperty :nextTo ; owl:allValuesFrom [ a owl:Class ; owl:oneOf ( :House2 ) ] ] ,
+    [ a owl:Restriction ; owl:onProperty :immediatelyRightOf ; owl:maxCardinality "0"^^xsd:nonNegativeInteger ] .
+:House2 :nextTo :House1, :House3 ; :immediatelyRightOf :House1 .
+:House2 rdf:type [ a owl:Restriction ; owl:onProperty :nextTo ; owl:allValuesFrom [ a owl:Class ; owl:oneOf ( :House1 :House3 ) ] ] ,
+    [ a owl:Restriction ; owl:onProperty :immediatelyRightOf ; owl:allValuesFrom [ a owl:Class ; owl:oneOf ( :House1 ) ] ] .
+:House3 :nextTo :House2, :House4 ; :immediatelyRightOf :House2 .
+:House3 rdf:type [ a owl:Restriction ; owl:onProperty :nextTo ; owl:allValuesFrom [ a owl:Class ; owl:oneOf ( :House2 :House4 ) ] ] ,
+    [ a owl:Restriction ; owl:onProperty :immediatelyRightOf ; owl:allValuesFrom [ a owl:Class ; owl:oneOf ( :House2 ) ] ] .
+:House4 :nextTo :House3, :House5 ; :immediatelyRightOf :House3 .
+:House4 rdf:type [ a owl:Restriction ; owl:onProperty :nextTo ; owl:allValuesFrom [ a owl:Class ; owl:oneOf ( :House3 :House5 ) ] ] ,
+    [ a owl:Restriction ; owl:onProperty :immediatelyRightOf ; owl:allValuesFrom [ a owl:Class ; owl:oneOf ( :House3 ) ] ] .
+:House5 :nextTo :House4 ; :immediatelyRightOf :House4 .
+:House5 rdf:type [ a owl:Restriction ; owl:onProperty :nextTo ; owl:allValuesFrom [ a owl:Class ; owl:oneOf ( :House4 ) ] ] ,
+    [ a owl:Restriction ; owl:onProperty :immediatelyRightOf ; owl:allValuesFrom [ a owl:Class ; owl:oneOf ( :House4 ) ] ] .
+
+#################################################################
+# Clues
+#################################################################
+
+# Clue 2: The Englishman lives in the red house.
+:Englishman rdf:type [ a owl:Restriction ; owl:onProperty :livesIn ; owl:someValuesFrom [ a owl:Restriction ; owl:onProperty :hasColor ; owl:hasValue :Red ] ] .
+
+# Clue 3: The Spaniard owns the dog.
+:Spaniard rdf:type [ a owl:Restriction ; owl:onProperty :livesIn ; owl:someValuesFrom [ a owl:Restriction ; owl:onProperty :hasPet ; owl:hasValue :Dog ] ] .
+
+# Clue 4: Coffee is drunk in the green house.
+:Coffee rdf:type [ a owl:Restriction ; owl:onProperty :drunkIn ; owl:someValuesFrom [ a owl:Restriction ; owl:onProperty :hasColor ; owl:hasValue :Green ] ] .
+
+# Clue 5: The Ukrainian drinks tea.
+:Ukrainian rdf:type [ a owl:Restriction ; owl:onProperty :livesIn ; owl:someValuesFrom [ a owl:Restriction ; owl:onProperty :hasDrink ; owl:hasValue :Tea ] ] .
